@@ -123,6 +123,9 @@
    (optional-path [:timeout-ms]) number?
    (optional-path [:timeout-val]) any-value])
 
+(def-map-schema converge-options-schema
+  lift-options-schema)
+
 ;;; We use macros so the stack trace reflects the calling location.
 (def ^{:dynamic true} *verify-contracts* true)
 
@@ -164,3 +167,7 @@
 (defmacro check-lift-options
   [m]
   (check-spec m `lift-options-schema &form))
+
+(defmacro check-converge-options
+  [m]
+  (check-spec m `converge-options-schema &form))

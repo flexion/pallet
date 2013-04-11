@@ -6,7 +6,8 @@
    [clojure.pprint :refer [print-table]]
    [pallet.compute :as compute]
    [pallet.configure :as configure]
-   [pallet.contracts :refer [check-group-spec check-lift-options check-node-spec
+   [pallet.contracts :refer [check-converge-options check-group-spec
+                             check-lift-options check-node-spec
                              check-server-spec check-user]]
    [pallet.core.user :as user]
    [pallet.core.operations :as ops]
@@ -311,6 +312,7 @@ specified in the `:extends` argument."
                                all-nodes all-node-set environment plan-state]
                         :or {phase [:configure]}
                         :as options}]
+  (check-converge-options options)
   (let [[phases phase-map] (process-phases phase)
         groups (if (map? group-spec->count)
                  [group-spec->count]
@@ -330,6 +332,7 @@ specified in the `:extends` argument."
         groups (map (partial group-with-environment environment) groups)
         targets (map (partial group-with-environment environment) targets)
         lift-options (select-keys options ops/lift-options)]
+    (doseq [group groups] (check-group-spec group))
     (dofsm converge
       [nodes-set (all-group-nodes compute groups all-node-set)
        nodes-set (result (concat nodes-set targets))
