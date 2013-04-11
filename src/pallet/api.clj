@@ -6,7 +6,7 @@
    [clojure.pprint :refer [print-table]]
    [pallet.compute :as compute]
    [pallet.configure :as configure]
-   [pallet.contracts :refer [check-group-spec check-node-spec
+   [pallet.contracts :refer [check-group-spec check-lift-options check-node-spec
                              check-server-spec check-user]]
    [pallet.core.user :as user]
    [pallet.core.operations :as ops]
@@ -437,6 +437,7 @@ the admin-user on the nodes.
   [node-set & {:keys [compute phase all-node-set environment]
                :or {phase [:configure]}
                :as options}]
+  (check-lift-options options)
   (let [[phases phase-map] (process-phases phase)
         {:keys [groups targets]} (-> node-set
                                      expand-cluster-groups
@@ -453,6 +454,7 @@ the admin-user on the nodes.
         targets (map (partial group-with-environment environment) targets)
         plan-state {}
         lift-options (select-keys options ops/lift-options)]
+    (doseq [group groups] (check-group-spec group))
     (dofsm lift
       [nodes-set (all-group-nodes compute groups all-node-set)
        nodes-set (result (concat nodes-set targets))
