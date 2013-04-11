@@ -7,7 +7,7 @@
    [pallet.compute :as compute]
    [pallet.configure :as configure]
    [pallet.contracts :refer [check-group-spec check-node-spec
-                             check-server-spec]]
+                             check-server-spec check-user]]
    [pallet.core.user :as user]
    [pallet.core.operations :as ops]
    [clojure.tools.logging :as logging])
@@ -660,13 +660,14 @@ insufficient.
     - :no-sudo"
   [username & {:keys [public-key-path private-key-path passphrase
                       password sudo-password no-sudo sudo-user] :as options}]
-  (user/make-user
-   username
-   (merge
-    {:private-key-path (user/default-private-key-path)
-     :public-key-path (user/default-public-key-path)
-     :sudo-password (:password options)}
-    options)))
+  (check-user
+   (user/make-user
+    username
+    (merge
+     {:private-key-path (user/default-private-key-path)
+      :public-key-path (user/default-public-key-path)
+      :sudo-password (:password options)}
+     options))))
 
 (defmacro with-admin-user
   "Specify the admin user for running remote commands.  The user is specified
